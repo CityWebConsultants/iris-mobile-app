@@ -136,13 +136,20 @@ myApp.services = {
           }
 
           // Get the field value.
-          var value = element.querySelector('input').value;
-
-          if (element.querySelector('input').type == 'checkbox') {
+          var value;
+          if(element.querySelector('textarea')){
+            console.log(element.querySelector('textarea'));
+             value = element.querySelector('textarea').value;
+          }
+          if(element.querySelector('input')){
+             value = element.querySelector('input').value;
+          }
+       
+          if (element.querySelector('input') && element.querySelector('input').type == 'checkbox') {
             value = element.querySelector('input').checked;
           }
 
-          node[key] = value;
+          node[key.toLowerCase()] = value;
         });
         if(uid){
           irisCli.editPage(uid,node).then(function(page){

@@ -146,18 +146,15 @@ irisCli.displayUser = function(eid){
 };
 
 irisCli.createPage = function(page){
-
+    console.log(page);
     return irisCli.Invoke({
-        'uri' : '/entity/create/page',
+        'uri' : '/entity/create/page?credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
         'method' : 'POST',
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
          }],
-        'content' : {
-            title: title,
-            body: body
-        }      
+        'content' : page    
     });
     
 };
