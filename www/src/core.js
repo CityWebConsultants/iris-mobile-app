@@ -11,9 +11,7 @@ irisCli.init = function() {
   irisCli.modules = {};
   irisCli.connected = false; // Will be equal to true after the system connect.
   irisCli.settings = {
-    sitePath: null,
-    adminUser: null
-
+    sitePath: null
   };
   irisCli.currentUser = JSON.parse(window.localStorage.getItem("user"));
 
@@ -25,10 +23,6 @@ irisCli.init();
 
 irisCli.sitePath = function() {
   return irisCli.settings.sitePath;
-};
-
-irisCli.adminUser = function() {
-  return irisCli.settings.adminUser;
 };
 
 /**
