@@ -184,6 +184,13 @@ myApp.services = {
       });
     }
   },
+  group : {
+    load : function(eid, list){
+        irisCli.displayGroup(eid).then(function(group) {
+         myApp.services.contentLoader(group,list);
+      });
+    }
+  },
 
 
   //////////////////////

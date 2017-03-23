@@ -205,6 +205,62 @@ myApp.controllers = {
     }
 
   },
+  //////////////////////////
+  // Group View Page Controller //
+  //////////////////////////
+  groupPage: function(page) {
+
+    // Click handler for Edit button
+    page.querySelector('[component="button/edit-group"]').onclick = function () {
+      fn.push('html/group_edit.html', {data: {id : document.querySelector('#myNavigator').topPage.data.id}});
+    };
+
+    // Click handler for Edit button
+    page.querySelector('[component="button/join-group"]').onclick = function () {
+      ons.notification.confirm(
+        {
+          title: 'Please confirm!',
+          message: 'Are you sure you wanna join this group?',
+          buttonLabels: ['No', 'Yes']
+        }
+      ).then(function(buttonIndex) {
+        if (buttonIndex === 1) {
+
+          myApp.services.entity.join('group', 'chito_type', document.querySelector('#myNavigator').topPage.data.id, 'field-list');
+
+        }
+      });
+    };
+    // Refresh the previous page on clicking back incase node was updated.
+    document.querySelector('#groupPage ons-back-button').options = {refresh: true}
+
+    // Load node and append to list.
+    myApp.services.group.load('group','chito_type',document.querySelector('#myNavigator').topPage.data.id, 'field-list');
+
+  },
+
+  ////////////////////////
+  // Group Page Controller //
+  ////////////////////////
+  groupViewPage : function(page) {
+
+    // Load the 'Frontpage' view which has had the 'Rest export' display added.
+    irisCli.listGroup().then(function(response) {
+      var list = response.response;
+      var listElement = document.getElementById('group-list'); //My ons-list element
+
+      for (var i = 0; i < list.length; i ++) {
+
+        var newItemElement = document.createElement('ons-list-item'); //My new item
+        newItemElement.innerText = list[i].name; //Text or HTML inside
+        newItemElement.setAttribute('tappable', '');
+        newItemElement.setAttribute('onclick', "fn.push('html/group.html', {data: {nid: " + list[i].eid + "}})");
+        listElement.appendChild(newItemElement);
+
+      }
+    });
+
+  },
   ////////////////////////
   // Menu Page Controller //
   ////////////////////////

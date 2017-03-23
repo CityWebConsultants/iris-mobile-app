@@ -199,6 +199,7 @@ irisCli.listPages = function(){
     
 };
 
+
 irisCli.joinGroup = function(eid, user){
 
     return irisCli.Invoke({
@@ -219,7 +220,7 @@ irisCli.joinGroup = function(eid, user){
 irisCli.displayGroup = function(eid){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["page"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]',
+        'uri' : '/fetch?entities=["group"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
@@ -229,10 +230,10 @@ irisCli.displayGroup = function(eid){
     
 };
 
-irisCli.listMembers = function(){
+irisCli.listGroup = function(){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["page"]',
+        'uri' : '/fetch?entities=["group"]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
