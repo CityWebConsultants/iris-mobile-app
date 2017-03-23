@@ -80,7 +80,7 @@ myApp.controllers = {
       document.querySelector('#menu').open();
     };
     if(irisCli.currentUser){
-      irisCli.displayUser().then(function(user){
+      irisCli.displayUser(irisCli.currentUser.userid).then(function(user){
         page.querySelector('#profile-name').innerHTML = user.response[0].name || "";
         page.querySelector('#profile-email').innerHTML = user.response[0].username || "";
       }, function(fail){
@@ -98,11 +98,8 @@ myApp.controllers = {
   //////////////////////////
   profileEditPage: function(page) {
 
-    // Get and load the current user.
-    var user = jDrupal.currentUser();
-
     // Render the user form.
-    myApp.services.user.update(user.entity.uid[0].value, 'profile-field-list');
+    myApp.services.user.update(irisCli.currentUser.userid, 'profile-field-list');
 
 
     // Save button click event.
