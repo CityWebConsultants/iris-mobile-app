@@ -52,6 +52,15 @@ irisCli.Invoke = function(options) {
 
     return new Promise(function(resolve, reject) {
         var req = new XMLHttpRequest();
+        if(options.credentials){
+            if(options.uri.indexOf("?") > -1){
+                options.uri+='&'            
+            }
+            else{
+                options.uri+='?'
+            }
+            options.uri+='credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}';
+        }
         req.open(options.method, irisCli.sitePath() + options.uri);
         if(options.headers){
             options.headers.forEach(function(header){
@@ -126,7 +135,8 @@ irisCli.editUser = function(eid, user){
             'key' :'content-type',
             'value' : 'application/json'
          }],
-        'content' : user     
+        'content' : user,
+        'credentials' : true    
     });
     
 };
@@ -140,7 +150,8 @@ irisCli.displayUser = function(eid){
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
-         }]   
+         }],
+        'credentials' : true     
     });
     
 };
@@ -148,13 +159,14 @@ irisCli.displayUser = function(eid){
 irisCli.createPage = function(page){
     console.log(page);
     return irisCli.Invoke({
-        'uri' : '/entity/create/page?credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
+        'uri' : '/entity/create/page?',
         'method' : 'POST',
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
          }],
-        'content' : page    
+        'content' : page,
+        'credentials' : true      
     });
     
 };
@@ -162,13 +174,14 @@ irisCli.createPage = function(page){
 irisCli.editPage = function(eid, page){
 
     return irisCli.Invoke({
-        'uri' : '/entity/edit/page/' + eid + '?credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
+        'uri' : '/entity/edit/page/' + eid + '?',
         'method' : 'POST',
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
          }],
-        'content' : page     
+        'content' : page,
+        'credentials' : true       
     });
     
 };
@@ -176,12 +189,13 @@ irisCli.editPage = function(eid, page){
 irisCli.displayPage = function(eid){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["page"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
+        'uri' : '/fetch?entities=["page"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
-         }]   
+         }],
+        'credentials' : true     
     });
     
 };
@@ -189,12 +203,13 @@ irisCli.displayPage = function(eid){
 irisCli.listPages = function(){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["page"]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
+        'uri' : '/fetch?entities=["page"]',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
-         }]   
+         }],
+        'credentials' : true     
     });
     
 };
@@ -212,7 +227,8 @@ irisCli.joinGroup = function(eid, user){
         'content' : {
             members: title,
             body: body
-        }      
+        },
+        'credentials' : true        
     });
     
 };
@@ -220,12 +236,13 @@ irisCli.joinGroup = function(eid, user){
 irisCli.displayGroup = function(eid){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["group"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
+        'uri' : '/fetch?entities=["group"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
-         }]   
+         }],
+        'credentials' : true     
     });
     
 };
@@ -233,12 +250,13 @@ irisCli.displayGroup = function(eid){
 irisCli.listGroup = function(){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["group"]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
+        'uri' : '/fetch?entities=["group"]',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
             'value' : 'application/json'
-         }]   
+         }],
+        'credentials' : true     
     });
     
 };
