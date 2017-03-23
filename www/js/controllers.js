@@ -8,7 +8,7 @@ myApp.controllers = {
   // Login Page Controller //
   //////////////////////////
   loginPage: function(page) {
-
+    
     // Login button click handler.
     page.querySelector('[component="button/login"]').onclick = function() {
 
@@ -19,6 +19,7 @@ myApp.controllers = {
         fn.pop({callback: function(e) {
 
           irisCli.setCurrentUser(user);
+          window.localStorage.setItem("user", JSON.stringify(user));
           document.querySelector('#myNavigator').pushPage('html/profile.html');
           fn.modalHide();
         }});
@@ -115,12 +116,36 @@ myApp.controllers = {
         if (buttonIndex === 1) {
 
           // Save the user entity.
-          myApp.services.user.save(user.entity.uid[0].value, 'profile-field-list');
+          myApp.services.user.save(irisCli.currentUser.userid, 'profile-field-list');
 
         }
       });
 
     }
+
+  },
+
+  //////////////////////////
+  // Node View Page Controller //
+  //////////////////////////
+  contentViewPage: function(page) {
+
+    irisCli.listPages().then(function(list) {
+
+      console.log(list);
+      // var listElement = document.getElementById('content-list'); //My ons-list element
+
+      // for (var i = 0; i < results.length; i ++) {
+
+      //   var node = new jDrupal.Node(results[i]);
+      //   var newItemElement = document.createElement('ons-list-item'); //My new item
+      //   newItemElement.innerText = node.getTitle(); //Text or HTML inside
+      //   newItemElement.setAttribute('tappable', '');
+      //   newItemElement.setAttribute('onclick', "fn.push('html/node.html', {data: {nid: " + node.id() + "}})");
+      //   listElement.appendChild(newItemElement)
+
+      // }
+    });
 
   },
 

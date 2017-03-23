@@ -17,7 +17,7 @@ myApp.services = {
       irisCli.displayUser(eid).then(function(user) {
 
         // Exclude from the form
-        var excludeList = ['uid', 'uuid', 'changed'];
+        var excludeList = [ 'eid', '_id', '__v', 'adminLinks', 'entityAuthor', 'entityType' ];
 
         // List to add elements to.
         var listElement = document.getElementById(list); //My ons-list element
@@ -32,7 +32,7 @@ myApp.services = {
             // skip loop if the property is from prototype
             if (!obj.hasOwnProperty(prop)) continue;
 
-            if (typeof obj[prop] != 'undefined') {
+            if ((typeof obj[prop] != 'undefined') && (excludeList.indexOf(prop) == -1)) {
 
               // TODO: Need to account for multi-value fields.
               var newItemElement = document.createElement('ons-list-item'); //My new item
@@ -72,6 +72,42 @@ myApp.services = {
           }
         }
       });
+    },
+    save : function(uid,list){
+        var user = {};
+        var listElement = document.getElementById(list); //My ons-list element
+
+        // Get all the fields from the form.
+        Array.prototype.forEach.call(listElement.querySelectorAll('.list__item'), function (element) {
+
+          // Get the field name.
+          if (element.querySelector('ons-if') != null) {
+            var key = element.querySelector('ons-if').innerText;
+          }
+          else {
+            var key = element.querySelector('label').innerText;
+          }
+
+          // Get the field value.
+          var value = element.querySelector('input').value;
+
+          if (element.querySelector('input').type == 'checkbox') {
+            value = element.querySelector('input').checked;
+          }
+
+          user[key] = value;
+        });
+        irisCli.editUser(uid,user).then(function(user){
+          fn.pop({
+            refresh: true, callback: function (e) {
+              fn.modalHide();
+              ons.notification.alert('Profile saved.');
+            }
+          });
+        },function(fail){
+          fn.modalHide();
+          ons.notification.alert(fail.message);
+        });
     }
   },
 

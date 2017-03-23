@@ -15,7 +15,7 @@ irisCli.init = function() {
     adminUser: null
 
   };
-  irisCli.currentUser = null;
+  irisCli.currentUser = JSON.parse(window.localStorage.getItem("user"));
 
 };
 
@@ -62,7 +62,12 @@ irisCli.Invoke = function(options) {
        
         req.onload = function() {
             if([200,201,202,204].indexOf(req.status) != -1){
-                resolve(JSON.parse(req.response));
+                if(['[','{'].indexOf(req.response[0]) > -1){   
+                    resolve(JSON.parse(req.response));
+                }
+                else{
+                    resolve(req.response);
+                }
             }
             else{
                 reject(Error(req.statusText));
@@ -111,6 +116,22 @@ irisCli.registerUser = function(name, pass, username){
     
 };
 
+
+irisCli.editUser = function(eid, user){
+
+    return irisCli.Invoke({
+        'uri' : '/entity/edit/user/' + eid,
+        'method' : 'POST',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }],
+        'content' : user     
+    });
+    
+};
+
+
 irisCli.displayUser = function(eid){
 
     return irisCli.Invoke({
@@ -157,7 +178,7 @@ irisCli.displayPage = function(eid){
 irisCli.listPages = function(){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["page"]',
+        'uri' : '/fetch?entities=["page"]&credentials={"userid":' + irisCli.currentUser.userid + ',"token:"' + irisCli.currentUser.token + '"}',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
@@ -210,5 +231,28 @@ irisCli.listMembers = function(){
     
 };
 
+irisCli.userLogout = function(){
+
+    irisCli.setCurrentUser(null);
+    window.localStorage.setItem("user", null);
+    irisCli.Invoke({
+        'uri' : '/logout',
+        'method' : 'POST',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+        }]    
+    }).then(function(user){
+        ons.notification.alert('Successfully logged out.');
+        document.querySelector('#myNavigator').resetToPage('html/profile.html')
+            .then(menu.close.bind(menu));
+    },function(fail){
+        ons.notification.alert('Successfully logged out.');
+        document.querySelector('#myNavigator').resetToPage('html/profile.html')
+            .then(menu.close.bind(menu));
+    });
+
+    
+};
 
 
