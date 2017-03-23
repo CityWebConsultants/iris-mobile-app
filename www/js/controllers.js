@@ -130,25 +130,81 @@ myApp.controllers = {
   //////////////////////////
   contentViewPage: function(page) {
 
-    irisCli.listPages().then(function(list) {
+    irisCli.listPages().then(function(response) {
+      var list = response.response;
+      var listElement = document.getElementById('content-list'); //My ons-list element
 
-      console.log(list);
-      // var listElement = document.getElementById('content-list'); //My ons-list element
+      for (var i = 0; i < list.length; i ++) {
 
-      // for (var i = 0; i < results.length; i ++) {
+        var newItemElement = document.createElement('ons-list-item'); //My new item
+        newItemElement.innerText = list[i].title; //Text or HTML inside
+        newItemElement.setAttribute('tappable', '');
+        newItemElement.setAttribute('onclick', "fn.push('html/node.html', {data: {nid: " + list[i].eid + "}})");
+        listElement.appendChild(newItemElement);
 
-      //   var node = new jDrupal.Node(results[i]);
-      //   var newItemElement = document.createElement('ons-list-item'); //My new item
-      //   newItemElement.innerText = node.getTitle(); //Text or HTML inside
-      //   newItemElement.setAttribute('tappable', '');
-      //   newItemElement.setAttribute('onclick', "fn.push('html/node.html', {data: {nid: " + node.id() + "}})");
-      //   listElement.appendChild(newItemElement)
-
-      // }
+      }
     });
 
   },
 
+  //////////////////////////
+  // Node View Page Controller //
+  //////////////////////////
+  nodePage: function(page) {
+
+    // Click handler for Edit button
+    page.querySelector('[component="button/edit-node"]').onclick = function () {
+      fn.push('html/node_edit.html', {data: {nid : document.querySelector('#myNavigator').topPage.data.nid}});
+    };
+
+    // Refresh the previous page on clicking back incase node was updated.
+    document.querySelector('#nodePage ons-back-button').options = {refresh: true}
+
+    // Load node and append to list.
+    myApp.services.node.load(document.querySelector('#myNavigator').topPage.data.nid, 'field-list');
+
+  },
+  //////////////////////////
+  // Node Create Page Controller //
+  //////////////////////////
+  nodeCreatePage: function(page) {
+
+    // Save button click event.
+    page.querySelector('[component="button/save-node"]').onclick = function() {
+
+      myApp.services.node.save(null, 'edit-field-list');
+
+    };
+
+  },
+  //////////////////////////
+  // Node Edit Page Controller //
+  //////////////////////////
+  nodeEditPage: function(page) {
+
+    // Populate the node edit form.
+    myApp.services.node.update(document.querySelector('#myNavigator').topPage.data.nid, 'edit-field-list');
+
+    // Node save button click event.
+    page.querySelector('[component="button/save-node"]').onclick = function() {
+
+      ons.notification.confirm(
+        {
+          title: 'Save changes?',
+          message: 'Previous data will be overwritten.',
+          buttonLabels: ['Discard', 'Save']
+        }
+      ).then(function(buttonIndex) {
+        if (buttonIndex === 1) {
+
+          myApp.services.node.save(document.querySelector('#myNavigator').topPage.data.nid, 'edit-field-list');
+
+        }
+      });
+
+    }
+
+  },
   ////////////////////////
   // Menu Page Controller //
   ////////////////////////

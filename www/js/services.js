@@ -5,28 +5,20 @@
 myApp.services = {
 
   // Based on whether user is authenticated or not, display profile fields or redirect to login page.
-  profileLoad: function(page){
+  
+  contentLoader: function(content,list){
 
-    document.querySelector('#myNavigator').pushPage('html/login.html');
-
-  },
-
-  user : {
-
-    update : function(eid, list){
-      irisCli.displayUser(eid).then(function(user) {
-
-        // Exclude from the form
+            // Exclude from the form
         var excludeList = [ 'eid', '_id', '__v', 'adminLinks', 'entityAuthor', 'entityType' ];
 
         // List to add elements to.
         var listElement = document.getElementById(list); //My ons-list element
 
-        for (var key in user.response) {
+        for (var key in content.response) {
           // skip loop if the property is from prototype
-          if (!user.response.hasOwnProperty(key) || excludeList.indexOf(key) > -1) continue;
+          if (!content.response.hasOwnProperty(key) || excludeList.indexOf(key) > -1) continue;
 
-          var obj = user.response[key];
+          var obj = content.response[key];
 
           for (var prop in obj) {
             // skip loop if the property is from prototype
@@ -71,6 +63,17 @@ myApp.services = {
             }
           }
         }
+
+  },
+  listLoader : function(){
+
+  },
+
+  user : {
+
+    update : function(eid, list){
+      irisCli.displayUser(eid).then(function(user) {
+        myApp.services.contentLoader(user,list);
       });
     },
     save : function(uid,list){
@@ -108,6 +111,70 @@ myApp.services = {
           fn.modalHide();
           ons.notification.alert(fail.message);
         });
+    }
+  },
+  node : {
+
+    update : function(eid, list){
+      irisCli.displayPage(eid).then(function(page) {
+        myApp.services.contentLoader(page,list);
+      });
+    },
+    save : function(uid,list){
+        var node = {};
+        var listElement = document.getElementById(list); //My ons-list element
+
+        // Get all the fields from the form.
+        Array.prototype.forEach.call(listElement.querySelectorAll('.list__item'), function (element) {
+
+          // Get the field name.
+          if (element.querySelector('ons-if') != null) {
+            var key = element.querySelector('ons-if').innerText;
+          }
+          else {
+            var key = element.querySelector('label').innerText;
+          }
+
+          // Get the field value.
+          var value = element.querySelector('input').value;
+
+          if (element.querySelector('input').type == 'checkbox') {
+            value = element.querySelector('input').checked;
+          }
+
+          node[key] = value;
+        });
+        if(uid){
+          irisCli.editPage(uid,node).then(function(page){
+            fn.pop({
+              refresh: true, callback: function (e) {
+                fn.modalHide();
+                ons.notification.alert('Article saved.');
+              }
+            });
+          },function(fail){
+            fn.modalHide();
+            ons.notification.alert(fail.message);
+          });
+        }
+        else{
+          irisCli.createPage(node).then(function(page){
+            fn.pop({
+              refresh: true, callback: function (e) {
+                fn.modalHide();
+                ons.notification.alert('Article saved.');
+              }
+            });
+          },function(fail){
+            fn.modalHide();
+            ons.notification.alert(fail.message);
+          });          
+       }
+    },
+    load : function(eid, list){
+        irisCli.displayPage(eid).then(function(page) {
+         myApp.services.contentLoader(page,list);
+      });
     }
   },
 

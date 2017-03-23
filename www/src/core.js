@@ -145,7 +145,7 @@ irisCli.displayUser = function(eid){
     
 };
 
-irisCli.createPage = function(title, body){
+irisCli.createPage = function(page){
 
     return irisCli.Invoke({
         'uri' : '/entity/create/page',
@@ -162,10 +162,24 @@ irisCli.createPage = function(title, body){
     
 };
 
+irisCli.editPage = function(eid, page){
+
+    return irisCli.Invoke({
+        'uri' : '/entity/edit/page/' + eid + '?credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
+        'method' : 'POST',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }],
+        'content' : page     
+    });
+    
+};
+
 irisCli.displayPage = function(eid){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["page"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]',
+        'uri' : '/fetch?entities=["page"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
@@ -178,7 +192,7 @@ irisCli.displayPage = function(eid){
 irisCli.listPages = function(){
 
     return irisCli.Invoke({
-        'uri' : '/fetch?entities=["page"]&credentials={"userid":' + irisCli.currentUser.userid + ',"token:"' + irisCli.currentUser.token + '"}',
+        'uri' : '/fetch?entities=["page"]&credentials={"userid":' + irisCli.currentUser.userid + ',"token":"' + irisCli.currentUser.token + '"}',
         'method' : 'GET',
         'headers' : [{
             'key' :'content-type',
