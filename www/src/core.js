@@ -15,6 +15,8 @@ irisCli.init = function() {
     adminUser: null
 
   };
+  irisCli.currentUser = null;
+
 };
 
 // Init jDrupal.
@@ -50,7 +52,6 @@ irisCli.Invoke = function(options) {
 
     return new Promise(function(resolve, reject) {
         var req = new XMLHttpRequest();
-
         req.open(options.method, irisCli.sitePath() + options.uri);
         if(options.headers){
             options.headers.forEach(function(header){
@@ -58,10 +59,10 @@ irisCli.Invoke = function(options) {
             })
         }
 
-        console.log(req);
+       
         req.onload = function() {
             if([200,201,202,204].indexOf(req.status) != -1){
-                resolve(req.body);
+                resolve(JSON.parse(req.response));
             }
             else{
                 reject(Error(req.statusText));
@@ -71,6 +72,11 @@ irisCli.Invoke = function(options) {
         req.onerror = function(e) { reject(Error("Network Error")); };
         req.send(JSON.stringify(options.content));
     });
+};
+
+
+irisCli.setCurrentUser = function(user){
+    irisCli.currentUser = user;
 };
 
 irisCli.userLogin = function(name, pass){
@@ -88,33 +94,121 @@ irisCli.userLogin = function(name, pass){
     });
 };
 
-irisCli.createUser = function(name, pass){
+irisCli.registerUser = function(name, pass, username){
 
-    var admin = irisCli.adminUser();
-
-    var auth = irisCli.userLogin(admin.username,admin.password);
-
-    auth.then(function(res){
-        return irisCli.Invoke({
-            'uri' : '/entity/create/user',
-            'method' : 'POST',
-            'headers' : [{
-                'key' :'content-type',
-                'value' : 'application/json'
-            }],
-            'content' : {
-                username: name,
-                password: pass,
-                roles: ['authenticated'],
-                credentials: res
-            }      
-        });
-    },function(){
-        console.log(e);
-        return new Error("failed to create user");
-    })
-
+    return irisCli.Invoke({
+        'uri' : '/entity/create/user',
+        'method' : 'POST',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }],
+        'content' : {
+            username: name,
+            password: pass
+        }      
+    });
     
 };
+
+irisCli.displayUser = function(eid){
+
+    return irisCli.Invoke({
+        'uri' : '/fetch?entities=["user"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]',
+        'method' : 'GET',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }]   
+    });
+    
+};
+
+irisCli.createPage = function(title, body){
+
+    return irisCli.Invoke({
+        'uri' : '/entity/create/page',
+        'method' : 'POST',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }],
+        'content' : {
+            title: title,
+            body: body
+        }      
+    });
+    
+};
+
+irisCli.displayPage = function(eid){
+
+    return irisCli.Invoke({
+        'uri' : '/fetch?entities=["page"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]',
+        'method' : 'GET',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }]   
+    });
+    
+};
+
+irisCli.listPages = function(){
+
+    return irisCli.Invoke({
+        'uri' : '/fetch?entities=["page"]',
+        'method' : 'GET',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }]   
+    });
+    
+};
+
+irisCli.joinGroup = function(eid, user){
+
+    return irisCli.Invoke({
+        'uri' : '/entity/edit/group/' + eid,
+        'method' : 'POST',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }],
+        'content' : {
+            members: title,
+            body: body
+        }      
+    });
+    
+};
+
+irisCli.displayGroup = function(eid){
+
+    return irisCli.Invoke({
+        'uri' : '/fetch?entities=["page"]&queries=[{"field":"eid","operator":"is","value":' + eid + '}]',
+        'method' : 'GET',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }]   
+    });
+    
+};
+
+irisCli.listMembers = function(){
+
+    return irisCli.Invoke({
+        'uri' : '/fetch?entities=["page"]',
+        'method' : 'GET',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }]   
+    });
+    
+};
+
 
 

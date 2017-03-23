@@ -14,16 +14,16 @@ myApp.controllers = {
 
       // Login using username and password.
       fn.modalShow();
-      irisCli.userLogin(page.querySelector('#name-input').value, page.querySelector('#pass-input').value).then(function(e) {
+      irisCli.userLogin(page.querySelector('#name-input').value, page.querySelector('#pass-input').value).then(function(user) {
+   
         fn.pop({callback: function(e) {
 
-          //myApp.services.profileLoad(document.querySelector('#myNavigator').topPage);
+          irisCli.setCurrentUser(user);
           document.querySelector('#myNavigator').pushPage('html/profile.html');
           fn.modalHide();
         }});
 
       }, function (fail) {
-        console.log(fail);
         document.querySelector('#myNavigator').pushPage('html/login.html');
          fn.modalHide();
       //  ons.notification.alert('failed: ' + fail.message);
@@ -34,10 +34,7 @@ myApp.controllers = {
     // Register button click handler.
     page.querySelector('[component="button/register"]').onclick = function() {
 
-      fn.pop({callback : function(e) {
-        // Load the register page.
-        fn.push('html/register.html');
-      }});
+      fn.push('html/register.html');
 
     };
 
@@ -53,7 +50,7 @@ myApp.controllers = {
 
       // Submit request.
       fn.modalShow();
-      jDrupal.userRegister(
+      irisCli.registerUser(
         page.querySelector('#name-input').value,
         page.querySelector('#pass-input').value,
         page.querySelector('#email-input').value
@@ -61,8 +58,8 @@ myApp.controllers = {
 
         ons.notification.alert('Registration successful. Please login.');
         fn.pop({callback: function(e) {
-          myApp.services.profileLoad(document.querySelector('#myNavigator').topPage);
-          fn.modalHide();
+          document.querySelector('#myNavigator').pushPage('html/login.html');
+   
         }});
 
       }, function (fail) {
@@ -82,9 +79,51 @@ myApp.controllers = {
     page.querySelector('[component="button/menu"]').onclick = function () {
       document.querySelector('#menu').open();
     };
+    if(irisCli.currentUser){
+      irisCli.displayUser().then(function(user){
+        page.querySelector('#profile-name').innerHTML = user.response[0].name || "";
+        page.querySelector('#profile-email').innerHTML = user.response[0].username || "";
+      }, function(fail){
+        ons.notification.alert('Failed: ' + fail.message);
+      })
+    }
+    else{
+      document.querySelector('#myNavigator').pushPage('html/login.html');
+    }
+    
 
-    // Load the profile fields.
-    myApp.services.profileLoad(page);
+  },
+    //////////////////////////
+  // Profile Edit Page Controller //
+  //////////////////////////
+  profileEditPage: function(page) {
+
+    // Get and load the current user.
+    var user = jDrupal.currentUser();
+
+    // Render the user form.
+    myApp.services.user.update(user.entity.uid[0].value, 'profile-field-list');
+
+
+    // Save button click event.
+    page.querySelector('[component="button/save-node"]').onclick = function() {
+
+      ons.notification.confirm(
+        {
+          title: 'Save changes?',
+          message: 'Previous data will be overwritten.',
+          buttonLabels: ['Discard', 'Save']
+        }
+      ).then(function(buttonIndex) {
+        if (buttonIndex === 1) {
+
+          // Save the user entity.
+          myApp.services.user.save(user.entity.uid[0].value, 'profile-field-list');
+
+        }
+      });
+
+    }
 
   },
 

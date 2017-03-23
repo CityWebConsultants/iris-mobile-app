@@ -25,11 +25,5 @@ document.addEventListener('init', function(event) {
     irisCli.config('sitePath', 'http://mysite.local:3001');
   }
 
-  irisCli.config('adminUser',{
-    "username":"chito@citywebconsultants.co.uk",
-    "password" : "Jrtnry1!"
-  });
-
-
 });
 
