@@ -235,7 +235,7 @@ myApp.controllers = {
     document.querySelector('#groupPage ons-back-button').options = {refresh: true}
 
     // Load node and append to list.
-    myApp.services.group.load('group','chito_type',document.querySelector('#myNavigator').topPage.data.id, 'field-list');
+    myApp.services.group.load(document.querySelector('#myNavigator').topPage.data.nid, 'field-list');
 
   },
 
