@@ -226,11 +226,28 @@ myApp.controllers = {
       ).then(function(buttonIndex) {
         if (buttonIndex === 1) {
 
-          myApp.services.entity.join('group', 'chito_type', document.querySelector('#myNavigator').topPage.data.id, 'field-list');
+          myApp.services.group.join(document.querySelector('#myNavigator').topPage.data.id);
 
         }
       });
     };
+     // Click handler for Edit button
+    page.querySelector('[component="button/leave-group"]').onclick = function () {
+      ons.notification.confirm(
+        {
+          title: 'Please confirm!',
+          message: 'Are you sure you wanna leave this group?',
+          buttonLabels: ['No', 'Yes']
+        }
+      ).then(function(buttonIndex) {
+        if (buttonIndex === 1) {
+
+          myApp.services.group.leave(document.querySelector('#myNavigator').topPage.data.id);
+
+        }
+      });
+    };
+
     // Refresh the previous page on clicking back incase node was updated.
     document.querySelector('#groupPage ons-back-button').options = {refresh: true}
 
@@ -269,7 +286,6 @@ myApp.controllers = {
   groupEditPage: function(page) {
 
     // Populate the node edit form.
-    console.log(document.querySelector('#myNavigator').topPage.data,"chito");
     myApp.services.group.update(document.querySelector('#myNavigator').topPage.data.id, 'edit-field-list');
 
     // Node save button click event.

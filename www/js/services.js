@@ -200,8 +200,60 @@ myApp.services = {
        }
     },
     load : function(eid, list){
-        irisCli.displayGroup(eid).then(function(group) {
+      irisCli.displayGroup(eid).then(function(group) {
          myApp.services.contentLoader(group,list);
+      });
+    },
+    join : function(eid){
+      irisCli.displayGroup(eid).then(function(content) {
+        var group = content.response[0];
+        if(group.field_users){
+          if(!group.field_users.length){
+            group.field_users = [];
+          }
+          group.field_users.push({field_uid: irisCli.currentUser.userid});
+        }
+         irisCli.editGroup(eid,group).then(function(page){
+            fn.pop({
+                refresh: true, callback: function (e) {
+                  fn.modalHide();
+                  ons.notification.alert('Successfully joined.');
+                }
+              });
+            },function(fail){
+              fn.modalHide();
+              ons.notification.alert(fail.message);
+        });
+      });
+      
+    },
+    leave : function(eid){
+      irisCli.displayGroup(eid).then(function(content) {
+        var group = content.response[0];
+        if(group.field_users){
+          var members = [];
+          group.field_users.forEach(function(user){
+            if(user.field_uid ==  irisCli.currentUser.userid){
+              user = null;
+              delete user;
+            }
+            else{
+              members.push(user);
+            }
+          });
+          group.field_users = members;
+        }
+         irisCli.editGroup(eid,group).then(function(page){
+            fn.pop({
+                refresh: true, callback: function (e) {
+                  fn.modalHide();
+                  ons.notification.alert('Successfully leaved.');
+                }
+              });
+            },function(fail){
+              fn.modalHide();
+              ons.notification.alert(fail.message);
+        });
       });
     }
   },

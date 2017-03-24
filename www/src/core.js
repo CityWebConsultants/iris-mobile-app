@@ -151,7 +151,7 @@ irisCli.displayUser = function(eid){
 };
 
 irisCli.createPage = function(page){
-    console.log(page);
+
     return irisCli.Invoke({
         'uri' : '/entity/create/page?',
         'method' : 'POST',
@@ -208,8 +208,21 @@ irisCli.listPages = function(){
     
 };
 
+irisCli.createGroup = function(group){
+    return irisCli.Invoke({
+        'uri' : '/entity/create/group?',
+        'method' : 'POST',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }],
+        'content' : group,
+        'credentials' : true      
+    });
+    
+};
 
-irisCli.joinGroup = function(eid, user){
+irisCli.editGroup = function(eid, group){
 
     return irisCli.Invoke({
         'uri' : '/entity/edit/group/' + eid,
@@ -218,10 +231,7 @@ irisCli.joinGroup = function(eid, user){
             'key' :'content-type',
             'value' : 'application/json'
          }],
-        'content' : {
-            members: title,
-            body: body
-        },
+        'content' : group,
         'credentials' : true        
     });
     
