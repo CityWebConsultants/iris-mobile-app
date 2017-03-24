@@ -9,7 +9,7 @@ myApp.services = {
   contentLoader: function(content,list){
 
             // Exclude from the form
-        var excludeList = [ 'eid', '_id', '__v', 'adminLinks', 'entityAuthor', 'entityType' ];
+        var excludeList = [ 'eid', '_id', '__v', 'adminLinks', 'entityAuthor', 'entityType', 'field_users' ];
 
         // List to add elements to.
         var listElement = document.getElementById(list); //My ons-list element
@@ -65,62 +65,7 @@ myApp.services = {
         }
 
   },
-  listLoader : function(){
-
-  },
-
-  user : {
-
-    update : function(eid, list){
-      irisCli.displayUser(eid).then(function(user) {
-        myApp.services.contentLoader(user,list);
-      });
-    },
-    save : function(uid,list){
-        var user = {};
-        var listElement = document.getElementById(list); //My ons-list element
-
-        // Get all the fields from the form.
-        Array.prototype.forEach.call(listElement.querySelectorAll('.list__item'), function (element) {
-
-          // Get the field name.
-          if (element.querySelector('ons-if') != null) {
-            var key = element.querySelector('ons-if').innerText;
-          }
-          else {
-            var key = element.querySelector('label').innerText;
-          }
-
-          // Get the field value.
-          var value = element.querySelector('input').value;
-
-          if (element.querySelector('input').type == 'checkbox') {
-            value = element.querySelector('input').checked;
-          }
-
-          user[key] = value;
-        });
-        irisCli.editUser(uid,user).then(function(user){
-          fn.pop({
-            refresh: true, callback: function (e) {
-              fn.modalHide();
-              ons.notification.alert('Profile saved.');
-            }
-          });
-        },function(fail){
-          fn.modalHide();
-          ons.notification.alert(fail.message);
-        });
-    }
-  },
-  node : {
-
-    update : function(eid, list){
-      irisCli.displayPage(eid).then(function(page) {
-        myApp.services.contentLoader(page,list);
-      });
-    },
-    save : function(uid,list){
+  nodeCollector : function(list){
         var node = {};
         var listElement = document.getElementById(list); //My ons-list element
 
@@ -151,6 +96,41 @@ myApp.services = {
 
           node[key.toLowerCase()] = value;
         });
+
+        return node;
+  },
+
+  user : {
+
+    update : function(eid, list){
+      irisCli.displayUser(eid).then(function(user) {
+        myApp.services.contentLoader(user,list);
+      });
+    },
+    save : function(uid,list){
+        var node = myApp.services.nodeCollector(list);
+        irisCli.editUser(uid,node).then(function(user){
+          fn.pop({
+            refresh: true, callback: function (e) {
+              fn.modalHide();
+              ons.notification.alert('Profile saved.');
+            }
+          });
+        },function(fail){
+          fn.modalHide();
+          ons.notification.alert(fail.message);
+        });
+    }
+  },
+  node : {
+
+    update : function(eid, list){
+      irisCli.displayPage(eid).then(function(page) {
+        myApp.services.contentLoader(page,list);
+      });
+    },
+    save : function(uid,list){
+        var node = myApp.services.nodeCollector(list);
         if(uid){
           irisCli.editPage(uid,node).then(function(page){
             fn.pop({
@@ -185,6 +165,40 @@ myApp.services = {
     }
   },
   group : {
+    update : function(eid, list){
+      irisCli.displayGroup(eid).then(function(group) {
+        myApp.services.contentLoader(group,list);
+      });
+    },
+    save : function(uid,list){
+        var node = myApp.services.nodeCollector(list);
+        if(uid){
+          irisCli.editGroup(uid,node).then(function(page){
+            fn.pop({
+              refresh: true, callback: function (e) {
+                fn.modalHide();
+                ons.notification.alert('Group saved.');
+              }
+            });
+          },function(fail){
+            fn.modalHide();
+            ons.notification.alert(fail.message);
+          });
+        }
+        else{
+          irisCli.createGroup(node).then(function(page){
+            fn.pop({
+              refresh: true, callback: function (e) {
+                fn.modalHide();
+                ons.notification.alert('Group saved.');
+              }
+            });
+          },function(fail){
+            fn.modalHide();
+            ons.notification.alert(fail.message);
+          });          
+       }
+    },
     load : function(eid, list){
         irisCli.displayGroup(eid).then(function(group) {
          myApp.services.contentLoader(group,list);

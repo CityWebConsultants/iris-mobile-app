@@ -235,7 +235,7 @@ myApp.controllers = {
     document.querySelector('#groupPage ons-back-button').options = {refresh: true}
 
     // Load node and append to list.
-    myApp.services.group.load(document.querySelector('#myNavigator').topPage.data.nid, 'field-list');
+    myApp.services.group.load(document.querySelector('#myNavigator').topPage.data.id, 'field-list');
 
   },
 
@@ -247,18 +247,49 @@ myApp.controllers = {
     // Load the 'Frontpage' view which has had the 'Rest export' display added.
     irisCli.listGroup().then(function(response) {
       var list = response.response;
+      
       var listElement = document.getElementById('group-list'); //My ons-list element
 
       for (var i = 0; i < list.length; i ++) {
 
         var newItemElement = document.createElement('ons-list-item'); //My new item
+        console.log(list[i], list[i].eid);
         newItemElement.innerText = list[i].name; //Text or HTML inside
         newItemElement.setAttribute('tappable', '');
-        newItemElement.setAttribute('onclick', "fn.push('html/group.html', {data: {nid: " + list[i].eid + "}})");
+        newItemElement.setAttribute('onclick', "fn.push('html/group.html', {data: {id: " + list[i].eid + "}})");
         listElement.appendChild(newItemElement);
 
       }
     });
+
+  },
+  // //////////////////////////
+  // Group Edit Page Controller //
+  //////////////////////////
+  groupEditPage: function(page) {
+
+    // Populate the node edit form.
+    console.log(document.querySelector('#myNavigator').topPage.data,"chito");
+    myApp.services.group.update(document.querySelector('#myNavigator').topPage.data.id, 'edit-field-list');
+
+    // Node save button click event.
+    page.querySelector('[component="button/save-group"]').onclick = function() {
+
+      ons.notification.confirm(
+        {
+          title: 'Save changes?',
+          message: 'Previous data will be overwritten.',
+          buttonLabels: ['Discard', 'Save']
+        }
+      ).then(function(buttonIndex) {
+        if (buttonIndex === 1) {
+
+          myApp.services.group.save(document.querySelector('#myNavigator').topPage.data.id, 'edit-field-list');
+
+        }
+      });
+
+    }
 
   },
   ////////////////////////
