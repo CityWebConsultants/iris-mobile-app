@@ -268,10 +268,33 @@ myApp.controllers = {
       for (var i = 0; i < list.length; i ++) {
 
         var newItemElement = document.createElement('ons-list-item'); //My new item
-        console.log(list[i], list[i].eid);
         newItemElement.innerText = list[i].name; //Text or HTML inside
         newItemElement.setAttribute('tappable', '');
         newItemElement.setAttribute('onclick', "fn.push('html/group.html', {data: {id: " + list[i].eid + "}})");
+        listElement.appendChild(newItemElement);
+
+      }
+    });
+
+  },
+  ////////////////////////
+  // Group Member Controller //
+  ////////////////////////
+  groupMemberPage  : function(page) {
+
+    
+    // Load the 'Frontpage' view which has had the 'Rest export' display added.
+    irisCli.displayGroup(document.querySelector('#myNavigator').topPage.data.id).then(function(response) {
+      var list = response.response[0].field_users;
+      var listElement = document.getElementById('member-list'); //My ons-list element
+
+      for (var i = 0; i < list.length; i ++) {
+
+        var newItemElement = document.createElement('ons-list-item'); //My new item
+ 
+        newItemElement.innerText = list[i].field_uid; //Text or HTML inside
+     //   newItemElement.setAttribute('tappable', '');
+     //   newItemElement.setAttribute('onclick', "fn.push('html/group.html', {data: {id: " + list[i].eid + "}})");
         listElement.appendChild(newItemElement);
 
       }

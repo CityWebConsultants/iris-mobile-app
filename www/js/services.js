@@ -9,7 +9,7 @@ myApp.services = {
   contentLoader: function(content,list){
 
             // Exclude from the form
-        var excludeList = [ 'eid', '_id', '__v', 'adminLinks', 'entityAuthor', 'entityType', 'field_users' ];
+        var excludeList = [ 'eid', '_id', '__v', 'adminLinks', 'entityAuthor', 'entityType' ];
 
         // List to add elements to.
         var listElement = document.getElementById(list); //My ons-list element
@@ -45,6 +45,12 @@ myApp.services = {
                   '<ons-switch id="' + prop +'-input" data-key="' + prop + '" ' + checked + ' input-id="inner-highlight-input"></ons-switch>' +
                   '</label>';
 
+              }
+              else if(prop == "field_users"){
+                elementHTML += '<label class="center" for="inner-highlight-input">' + prop + '</label>' +
+                  '<div class="center">' +
+                  '<ons-toolbar-button component="button/members" onclick="fn.push(\'html/group_members.html\', {data: {id: ' + obj.eid + '}})">View Members</ons-toolbar-button>' +
+                  '</div>';
               }
               else {
                 // Else use textfields.
