@@ -199,12 +199,14 @@ myApp.services = {
           });          
        }
     },
-    load : function(eid, list){
+    load : function(eid, list, callback){
       irisCli.displayGroup(eid).then(function(group) {
          myApp.services.contentLoader(group,list);
+         callback(group.response[0]);
       });
     },
     join : function(eid){
+      
       irisCli.displayGroup(eid).then(function(content) {
         var group = content.response[0];
         if(group.field_users){
@@ -213,6 +215,7 @@ myApp.services = {
           }
           group.field_users.push({field_uid: irisCli.currentUser.userid});
         }
+        group.members = group.field_users.length;
          irisCli.editGroup(eid,group).then(function(page){
             fn.pop({
                 refresh: true, callback: function (e) {
@@ -234,8 +237,6 @@ myApp.services = {
           var members = [];
           group.field_users.forEach(function(user){
             if(user.field_uid ==  irisCli.currentUser.userid){
-              user = null;
-              delete user;
             }
             else{
               members.push(user);
@@ -243,6 +244,7 @@ myApp.services = {
           });
           group.field_users = members;
         }
+        group.members = group.field_users.length;
          irisCli.editGroup(eid,group).then(function(page){
             fn.pop({
                 refresh: true, callback: function (e) {

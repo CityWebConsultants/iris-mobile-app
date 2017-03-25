@@ -214,45 +214,43 @@ myApp.controllers = {
     page.querySelector('[component="button/edit-group"]').onclick = function () {
       fn.push('html/group_edit.html', {data: {id : document.querySelector('#myNavigator').topPage.data.id}});
     };
-
-    // Click handler for Edit button
-    page.querySelector('[component="button/join-group"]').onclick = function () {
-      ons.notification.confirm(
-        {
-          title: 'Please confirm!',
-          message: 'Are you sure you wanna join this group?',
-          buttonLabels: ['No', 'Yes']
-        }
-      ).then(function(buttonIndex) {
-        if (buttonIndex === 1) {
-
-          myApp.services.group.join(document.querySelector('#myNavigator').topPage.data.id);
-
-        }
-      });
-    };
-     // Click handler for Edit button
-    page.querySelector('[component="button/leave-group"]').onclick = function () {
-      ons.notification.confirm(
-        {
-          title: 'Please confirm!',
-          message: 'Are you sure you wanna leave this group?',
-          buttonLabels: ['No', 'Yes']
-        }
-      ).then(function(buttonIndex) {
-        if (buttonIndex === 1) {
-
-          myApp.services.group.leave(document.querySelector('#myNavigator').topPage.data.id);
-
-        }
-      });
-    };
-
     // Refresh the previous page on clicking back incase node was updated.
     document.querySelector('#groupPage ons-back-button').options = {refresh: true}
 
     // Load node and append to list.
-    myApp.services.group.load(document.querySelector('#myNavigator').topPage.data.id, 'field-list');
+    myApp.services.group.load(document.querySelector('#myNavigator').topPage.data.id, 'field-list',function(group){
+
+      page.querySelector('[component="button/join-group"]').onclick = function () {
+        ons.notification.confirm(
+          {
+            title: 'Please confirm!',
+            message: 'Are you sure you wanna join this group?',
+            buttonLabels: ['No', 'Yes']
+          }
+        ).then(function(buttonIndex) {
+          if (buttonIndex === 1) {
+            console.log(page.querySelector('[component="button/join-group"]').innerHTML == 'Join',page.querySelector('[component="button/join-group"]').innerHTML,"chito");
+            if(page.querySelector('[component="button/join-group"]').innerHTML.trim() == 'Join'){
+              myApp.services.group.join(document.querySelector('#myNavigator').topPage.data.id);
+            }
+            else{
+              myApp.services.group.leave(document.querySelector('#myNavigator').topPage.data.id);
+            }
+
+          }
+        });
+      };
+      // Click handler for Edit button
+      if(group.field_users){
+          group.field_users.forEach(function(user){
+            console.log(user.field_uid, irisCli.currentUser.userid);
+            if(user.field_uid ==  irisCli.currentUser.userid){
+              page.querySelector('[component="button/join-group"]').innerHTML = 'Leave';
+            }
+          });
+      }
+
+    });
 
   },
 
