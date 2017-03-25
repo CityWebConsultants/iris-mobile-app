@@ -150,6 +150,20 @@ irisCli.displayUser = function(eid){
     
 };
 
+irisCli.listUsers = function(eids){
+
+    return irisCli.Invoke({
+        'uri' : '/fetch?entities=["user"]&queries=[{"field":"eid","operator":"in","value":[' + eids + ']}]',
+        'method' : 'GET',
+        'headers' : [{
+            'key' :'content-type',
+            'value' : 'application/json'
+         }],
+        'credentials' : true     
+    });
+    
+};
+
 irisCli.createPage = function(page){
 
     return irisCli.Invoke({

@@ -285,19 +285,28 @@ myApp.controllers = {
     
     // Load the 'Frontpage' view which has had the 'Rest export' display added.
     irisCli.displayGroup(document.querySelector('#myNavigator').topPage.data.id).then(function(response) {
-      var list = response.response[0].field_users;
-      var listElement = document.getElementById('member-list'); //My ons-list element
-
-      for (var i = 0; i < list.length; i ++) {
-
-        var newItemElement = document.createElement('ons-list-item'); //My new item
- 
-        newItemElement.innerText = list[i].field_uid; //Text or HTML inside
-     //   newItemElement.setAttribute('tappable', '');
-     //   newItemElement.setAttribute('onclick', "fn.push('html/group.html', {data: {id: " + list[i].eid + "}})");
-        listElement.appendChild(newItemElement);
-
+      var users = [];
+      if(response.response[0].field_users){
+        response.response[0].field_users.forEach(function(user){
+          users.push(user.field_uid);
+        });
       }
+      irisCli.listUsers(users).then(function(response){
+        var list = response.response;
+        var listElement = document.getElementById('member-list'); //My ons-list element
+
+        for (var i = 0; i < list.length; i ++) {
+
+          var newItemElement = document.createElement('ons-list-item'); //My new item
+  
+          newItemElement.innerText = list[i].username; //Text or HTML inside
+      //   newItemElement.setAttribute('tappable', '');
+      //   newItemElement.setAttribute('onclick', "fn.push('html/group.html', {data: {id: " + list[i].eid + "}})");
+          listElement.appendChild(newItemElement);
+
+        }
+      });
+      
     });
 
   },
