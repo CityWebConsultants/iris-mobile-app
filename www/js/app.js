@@ -19,10 +19,12 @@ document.addEventListener('init', function(event) {
     // On Android emulators you cannot access local domains the same way you could on a browser of even iOS.
     // To access localhost, instead of 127.0.0.1, you have to use 10.0.2.2. This causes issues when trying to access
     // cookies from local domains.
-    irisCli.config('sitePath', 'http://10.0.2.2:3001');
+    irisCli.config('sitePath', 'http://0219eb6b.ngrok.io');
   }
   else {
-    irisCli.config('sitePath', 'http://mysite.local:3001');
+    irisCli.config('sitePath', 'http://0219eb6b.ngrok.io');
+
+    //irisCli.config('sitePath', 'http://iris.local');
   }
 
 });

@@ -7,33 +7,38 @@ myApp.controllers = {
   //////////////////////////
   // Login Page Controller //
   //////////////////////////
-  loginPage: function(page) {
-    
+  loginPage: function (page) {
+
     // Login button click handler.
-    page.querySelector('[component="button/login"]').onclick = function() {
+    page.querySelector('[component="button/login"]').onclick = function () {
 
       // Login using username and password.
       fn.modalShow();
-      irisCli.userLogin(page.querySelector('#name-input').value, page.querySelector('#pass-input').value).then(function(user) {
-   
-        fn.pop({callback: function(e) {
+      irisCli.userLogin(page.querySelector('#name-input').value, page.querySelector('#pass-input').value).then(function (user) {
 
-          irisCli.setCurrentUser(user);
-          window.localStorage.setItem("user", JSON.stringify(user));
-          document.querySelector('#myNavigator').pushPage('html/profile.html');
-          fn.modalHide();
-        }});
+        fn.pop({
+          callback: function (e) {
+
+            irisCli.setCurrentUser(user);
+            window.localStorage.setItem("user", JSON.stringify(user));
+            irisCli.checkToken(user);
+
+            document.querySelector('#myNavigator').pushPage('html/profile.html');
+            fn.modalHide();
+          }
+        });
 
       }, function (fail) {
         document.querySelector('#myNavigator').pushPage('html/login.html');
-         fn.modalHide();
-      //  ons.notification.alert('failed: ' + fail.message);
+        ons.notification.alert('Error logging in: ' + JSON.stringify(fail));
+        fn.modalHide();
+        //  ons.notification.alert('failed: ' + fail.message);
       });
 
     };
 
     // Register button click handler.
-    page.querySelector('[component="button/register"]').onclick = function() {
+    page.querySelector('[component="button/register"]').onclick = function () {
 
       fn.push('html/register.html');
 
@@ -44,10 +49,10 @@ myApp.controllers = {
   //////////////////////////
   // Register Page Controller //
   //////////////////////////
-  registerPage: function(page) {
+  registerPage: function (page) {
 
     // Register button click handler.
-    page.querySelector('[component="button/register"]').onclick = function() {
+    page.querySelector('[component="button/register"]').onclick = function () {
 
       // Submit request.
       fn.modalShow();
@@ -55,16 +60,19 @@ myApp.controllers = {
         page.querySelector('#name-input').value,
         page.querySelector('#pass-input').value,
         page.querySelector('#email-input').value
-      ).then(function(e) {
+      ).then(function (e) {
 
         ons.notification.alert('Registration successful. Please login.');
-        fn.pop({callback: function(e) {
-          document.querySelector('#myNavigator').pushPage('html/login.html');
-   
-        }});
+        fn.pop({
+          callback: function (e) {
+            document.querySelector('#myNavigator').pushPage('html/login.html');
+            fn.modalShow();
+          }
+        });
 
       }, function (fail) {
         ons.notification.alert('Failed: ' + fail.message);
+        fn.modalShow();
       });
 
     }
@@ -74,37 +82,42 @@ myApp.controllers = {
   //////////////////////////
   // Profile Page Controller //
   //////////////////////////
-  profilePage: function(page) {
+  profilePage: function (page) {
 
     // Set button functionality to open/close the menu.
     page.querySelector('[component="button/menu"]').onclick = function () {
       document.querySelector('#menu').open();
     };
-    if(irisCli.currentUser){
-      irisCli.displayUser(irisCli.currentUser.userid).then(function(user){
+
+    if (irisCli.currentUser) {
+
+      irisCli.displayUser(irisCli.currentUser.userid).then(function (user) {
+
         page.querySelector('#profile-name').innerHTML = user.response[0].name || "";
         page.querySelector('#profile-email').innerHTML = user.response[0].username || "";
-      }, function(fail){
+        irisCli.checkToken(user.response[0]);
+
+      }, function (fail) {
         ons.notification.alert('Failed: ' + fail.message);
-      })
+      });
+
     }
-    else{
+    else {
       document.querySelector('#myNavigator').pushPage('html/login.html');
     }
-    
 
   },
-    //////////////////////////
+  //////////////////////////
   // Profile Edit Page Controller //
   //////////////////////////
-  profileEditPage: function(page) {
+  profileEditPage: function (page) {
 
     // Render the user form.
     myApp.services.user.update(irisCli.currentUser.userid, 'profile-field-list');
 
 
     // Save button click event.
-    page.querySelector('[component="button/save-node"]').onclick = function() {
+    page.querySelector('[component="button/save-node"]').onclick = function () {
 
       ons.notification.confirm(
         {
@@ -112,7 +125,7 @@ myApp.controllers = {
           message: 'Previous data will be overwritten.',
           buttonLabels: ['Discard', 'Save']
         }
-      ).then(function(buttonIndex) {
+      ).then(function (buttonIndex) {
         if (buttonIndex === 1) {
 
           // Save the user entity.
@@ -128,13 +141,13 @@ myApp.controllers = {
   //////////////////////////
   // Node View Page Controller //
   //////////////////////////
-  contentViewPage: function(page) {
+  contentViewPage: function (page) {
 
-    irisCli.listPages().then(function(response) {
+    irisCli.listPages().then(function (response) {
       var list = response.response;
       var listElement = document.getElementById('content-list'); //My ons-list element
 
-      for (var i = 0; i < list.length; i ++) {
+      for (var i = 0; i < list.length; i++) {
 
         var newItemElement = document.createElement('ons-list-item'); //My new item
         newItemElement.innerText = list[i].title; //Text or HTML inside
@@ -150,11 +163,11 @@ myApp.controllers = {
   //////////////////////////
   // Node View Page Controller //
   //////////////////////////
-  nodePage: function(page) {
+  nodePage: function (page) {
 
     // Click handler for Edit button
     page.querySelector('[component="button/edit-node"]').onclick = function () {
-      fn.push('html/node_edit.html', {data: {nid : document.querySelector('#myNavigator').topPage.data.nid}});
+      fn.push('html/node_edit.html', {data: {nid: document.querySelector('#myNavigator').topPage.data.nid}});
     };
 
     // Refresh the previous page on clicking back incase node was updated.
@@ -167,10 +180,10 @@ myApp.controllers = {
   //////////////////////////
   // Node Create Page Controller //
   //////////////////////////
-  nodeCreatePage: function(page) {
+  nodeCreatePage: function (page) {
 
     // Save button click event.
-    page.querySelector('[component="button/save-node"]').onclick = function() {
+    page.querySelector('[component="button/save-node"]').onclick = function () {
 
       myApp.services.node.save(null, 'edit-field-list');
 
@@ -180,13 +193,13 @@ myApp.controllers = {
   //////////////////////////
   // Node Edit Page Controller //
   //////////////////////////
-  nodeEditPage: function(page) {
+  nodeEditPage: function (page) {
 
     // Populate the node edit form.
     myApp.services.node.update(document.querySelector('#myNavigator').topPage.data.nid, 'edit-field-list');
 
     // Node save button click event.
-    page.querySelector('[component="button/save-node"]').onclick = function() {
+    page.querySelector('[component="button/save-node"]').onclick = function () {
 
       ons.notification.confirm(
         {
@@ -194,7 +207,7 @@ myApp.controllers = {
           message: 'Previous data will be overwritten.',
           buttonLabels: ['Discard', 'Save']
         }
-      ).then(function(buttonIndex) {
+      ).then(function (buttonIndex) {
         if (buttonIndex === 1) {
 
           myApp.services.node.save(document.querySelector('#myNavigator').topPage.data.nid, 'edit-field-list');
@@ -208,11 +221,11 @@ myApp.controllers = {
   //////////////////////////
   // Group View Page Controller //
   //////////////////////////
-  groupPage: function(page) {
+  groupPage: function (page) {
 
     // Click handler for Edit button
     page.querySelector('[component="button/edit-group"]').onclick = function () {
-      fn.push('html/group_edit.html', {data: {id : document.querySelector('#myNavigator').topPage.data.id}});
+      fn.push('html/group_edit.html', {data: {id: document.querySelector('#myNavigator').topPage.data.id}});
     };
 
     // Click handler for Edit button
@@ -223,7 +236,7 @@ myApp.controllers = {
           message: 'Are you sure you wanna join this group?',
           buttonLabels: ['No', 'Yes']
         }
-      ).then(function(buttonIndex) {
+      ).then(function (buttonIndex) {
         if (buttonIndex === 1) {
 
           myApp.services.group.join(document.querySelector('#myNavigator').topPage.data.id);
@@ -231,7 +244,7 @@ myApp.controllers = {
         }
       });
     };
-     // Click handler for Edit button
+    // Click handler for Edit button
     page.querySelector('[component="button/leave-group"]').onclick = function () {
       ons.notification.confirm(
         {
@@ -239,7 +252,7 @@ myApp.controllers = {
           message: 'Are you sure you wanna leave this group?',
           buttonLabels: ['No', 'Yes']
         }
-      ).then(function(buttonIndex) {
+      ).then(function (buttonIndex) {
         if (buttonIndex === 1) {
 
           myApp.services.group.leave(document.querySelector('#myNavigator').topPage.data.id);
@@ -259,15 +272,15 @@ myApp.controllers = {
   ////////////////////////
   // Group Page Controller //
   ////////////////////////
-  groupViewPage : function(page) {
+  groupViewPage: function (page) {
 
     // Load the 'Frontpage' view which has had the 'Rest export' display added.
-    irisCli.listGroup().then(function(response) {
+    irisCli.listGroup().then(function (response) {
       var list = response.response;
-      
+
       var listElement = document.getElementById('group-list'); //My ons-list element
 
-      for (var i = 0; i < list.length; i ++) {
+      for (var i = 0; i < list.length; i++) {
 
         var newItemElement = document.createElement('ons-list-item'); //My new item
         console.log(list[i], list[i].eid);
@@ -283,13 +296,13 @@ myApp.controllers = {
   // //////////////////////////
   // Group Edit Page Controller //
   //////////////////////////
-  groupEditPage: function(page) {
+  groupEditPage: function (page) {
 
     // Populate the node edit form.
     myApp.services.group.update(document.querySelector('#myNavigator').topPage.data.id, 'edit-field-list');
 
     // Node save button click event.
-    page.querySelector('[component="button/save-group"]').onclick = function() {
+    page.querySelector('[component="button/save-group"]').onclick = function () {
 
       ons.notification.confirm(
         {
@@ -297,7 +310,7 @@ myApp.controllers = {
           message: 'Previous data will be overwritten.',
           buttonLabels: ['Discard', 'Save']
         }
-      ).then(function(buttonIndex) {
+      ).then(function (buttonIndex) {
         if (buttonIndex === 1) {
 
           myApp.services.group.save(document.querySelector('#myNavigator').topPage.data.id, 'edit-field-list');
@@ -311,7 +324,7 @@ myApp.controllers = {
   ////////////////////////
   // Menu Page Controller //
   ////////////////////////
-  menuPage: function(page) {
+  menuPage: function (page) {
 
   }
 };
@@ -319,23 +332,23 @@ myApp.controllers = {
 window.fn = {};
 
 // Show modal 'Loading'.
-window.fn.modalShow = function() {
+window.fn.modalShow = function () {
   document.getElementById('loadingModal').show();
 }
 
 // Hide modal 'Loading'.
-window.fn.modalHide = function() {
+window.fn.modalHide = function () {
   document.getElementById('loadingModal').hide();
 }
 
 // Open the menu.
-window.fn.open = function() {
+window.fn.open = function () {
   var menu = document.getElementById('menu');
   menu.open();
 };
 
 // pushPage extension to show/hide modals and close menu afterwards.
-window.fn.push = function(page, options) {
+window.fn.push = function (page, options) {
 
   if (!options) {
     options = {};
@@ -350,7 +363,7 @@ window.fn.push = function(page, options) {
 }
 
 // popPage extension.
-window.fn.pop = function(options) {
+window.fn.pop = function (options) {
   var content = document.getElementById('myNavigator');
   if (!options) {
     options = {};

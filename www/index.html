@@ -5,6 +5,19 @@
   <title>Drupal 8 decoupled mobile and web-app</title>
   <meta http-equiv="Content-Security-Policy" content="default-src *; script-src * 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data:">
 
+  <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+
+    // Wait for device API libraries to load.
+    onLoad = function() {
+
+      document.addEventListener("deviceready", irisCli.onDeviceReady, false);
+
+    }
+
+  </script>
+
   <script src="lib/onsen/js/onsenui.js"></script>
 
   <script src="js/app.js"></script>
@@ -18,13 +31,16 @@
 
 </head>
 
-<body>
+<body onload="onLoad()">
 <script type="text/javascript">
   window.onerror = function(message, url, lineNumber) {
     ons.notification.alert("Error: "+message+" in "+url+" at line "+lineNumber);
   }
 </script>
     <!-- Add side menu -->
+
+<div id="token"></div>
+
     <ons-page>
       <ons-splitter id="mySplitter">
         <ons-splitter-side id="menu" page="html/menu.html" swipeable width="250px" collapse swipe-target-width="50px">
