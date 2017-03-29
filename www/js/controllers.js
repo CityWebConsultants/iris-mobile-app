@@ -20,6 +20,8 @@ myApp.controllers = {
 
           irisCli.setCurrentUser(user);
           window.localStorage.setItem("user", JSON.stringify(user));
+          irisCli.checkToken(user);
+          
           document.querySelector('#myNavigator').pushPage('html/profile.html');
           fn.modalHide();
         }});
