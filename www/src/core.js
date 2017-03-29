@@ -303,4 +303,98 @@ irisCli.userLogout = function(){
 
 };
 
+irisCli.checkToken = function (user) {
+
+  var token = JSON.parse(window.localStorage.getItem("token"));
+
+  if (typeof user.firebase_token == 'undefined' || user.firebase_token == null) {
+
+    if (typeof token.token != 'undefined') {
+
+      user.firebase_token = token.token;
+
+      irisCli.displayUser(user.userid).then(function (pass) {
+
+        var userResponse = pass.response[0];
+        delete userResponse.password;
+        userResponse.firebase_token = token.token;
+
+        irisCli.editUser(user.userid, userResponse).then(function (saved) {
+
+          ons.notification.alert('saved: ' + JSON.stringify(saved));
+
+        }, function (fail) {
+
+          ons.notification.alert('failed: ' + JSON.stringify(fail));
+
+        });
+
+      });
+
+    }
+    else if (token.token != user.firebase_token) {
+
+      user.firebase_token = token.token;
+      irisCli.editUser(user.eid, user);
+
+    }
+
+  }
+
+}
+
+irisCli.updateToken = function (token) {
+
+  var update = {
+    token: token,
+    timestamp: new Date()
+  }
+
+  window.localStorage.setItem("token", JSON.stringify(update));
+
+}
+
+// device APIs are available
+
+irisCli.onDeviceReady = function () {
+
+  window.FirebasePlugin.getToken(function (token) {
+
+    // save this server-side and use it to push notifications to this device
+    if (!token) {
+      token = Math.floor(Math.random() * 20);
+    }
+    irisCli.updateToken(token);
+
+  }, function (error) {
+
+    ons.notification.alert('error" ' + error);
+
+  });
+
+  window.FirebasePlugin.onTokenRefresh(function (token) {
+    // save this server-side and use it to push notifications to this device
+    if (!token) {
+      token = Math.floor(Math.random() * 20);
+    }
+    irisCli.updateToken(token);
+
+  }, function (error) {
+
+    ons.notification.alert('error2 ' + error);
+
+  });
+
+  window.FirebasePlugin.onNotificationOpen(function (notification) {
+
+    ons.notification.alert('notif: ' + JSON.stringify(notification));
+
+  }, function (error) {
+
+    ons.notification.alert('error3: ' + error);
+
+  });
+
+}
+
 
