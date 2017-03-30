@@ -354,16 +354,42 @@ irisCli.updateToken = function (token) {
 
 }
 
+irisCli.submitLocation = function(){
+    navigator.geolocation.getCurrentPosition(function(position){
+        ons.notification.alert('latitude: ' + position.coords.latitude + ', longitude: ' + position.coords.latitude);
+        irisCli.displayUser(irisCli.currentUser.userid).then(function (pass) {
+
+            var userResponse = pass.response[0];
+            delete userResponse.password;
+            userResponse.latitude = position.coords.latitude;
+            userResponse.longitude = position.coords.longitude
+            irisCli.editUser(irisCli.currentUser.userid, userResponse).then(function (saved) {
+
+                ons.notification.alert('saved: ' + JSON.stringify(saved));
+
+            }, function (fail) {
+
+                ons.notification.alert('failed: ' + JSON.stringify(fail));
+
+            });
+
+        });
+    }, function(error){
+        ons.notification.alert('error: ' + JSON.stringify(error));
+    });
+};
+
 // device APIs are available
 
 irisCli.onDeviceReady = function () {
 
   window.FirebasePlugin.getToken(function (token) {
-
+    ons.notification.alert('token: " ' + token);
     // save this server-side and use it to push notifications to this device
     if (!token) {
       token = Math.floor(Math.random() * 20);
     }
+
     irisCli.updateToken(token);
 
   }, function (error) {
@@ -374,6 +400,7 @@ irisCli.onDeviceReady = function () {
 
   window.FirebasePlugin.onTokenRefresh(function (token) {
     // save this server-side and use it to push notifications to this device
+    ons.notification.alert('token: " ' + token);
     if (!token) {
       token = Math.floor(Math.random() * 20);
     }
@@ -388,6 +415,9 @@ irisCli.onDeviceReady = function () {
   window.FirebasePlugin.onNotificationOpen(function (notification) {
 
     ons.notification.alert('notif: ' + JSON.stringify(notification));
+    if(notification.message && (notification.message == "get-location")){
+        irisCli.submitLocation();
+    }
 
   }, function (error) {
 
